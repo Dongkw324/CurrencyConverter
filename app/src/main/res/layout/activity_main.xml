@@ -91,6 +91,7 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <Button
+        android:id="@+id/convert_btn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/button_color"
@@ -102,5 +103,18 @@
         android:layout_marginEnd="15dp"
         android:text="@string/button_text" />
 
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/convert_btn"
+        android:layout_marginTop="80dp"
+        android:enabled="false"
+        android:hint="@string/result_amount"
+        android:padding="10dp"
+        android:textColorHint="@color/black"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">환율 계산기 어플</string>
+    <string name="app_name">환율 전환 어플</string>
 
     <string name="convert_from">From</string>
     <string name="convert_to">To</string>
@@ -9,4 +9,5 @@
 
     <string name="button_text">전환하기</string>
     <string name="enter_amount">화폐액..</string>
+    <string name="result_amount">결과값</string>
 </resources>
