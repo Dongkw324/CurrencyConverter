@@ -18,7 +18,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/input_amount"
         android:layout_margin="30dp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/input_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/app_name"
+        app:layout_constraintBottom_toTopOf="@id/countryFrom"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:hint="@string/enter_amount"
+            android:textColorHint="@color/black"
+            android:inputType="numberDecimal" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
         android:id="@+id/countryFrom"
@@ -27,7 +46,7 @@
         android:text="@string/convert_from"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/app_name"
+        app:layout_constraintTop_toBottomOf="@id/input_amount"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="15dp"
         android:layout_marginTop="30dp" />
@@ -39,11 +58,49 @@
         android:hint="@string/first_country"
         android:textColorHint="@color/black"
         app:layout_constraintTop_toBottomOf="@id/countryFrom"
+        app:layout_constraintBottom_toTopOf="@id/countryTo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_margin="15dp"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintVertical_bias="0.0" />
-    
+
+    <TextView
+        android:id="@+id/countryTo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/convert_to"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/input_firstCountry"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="30dp" />
+
+    <com.jaredrummler.materialspinner.MaterialSpinner
+        android:id="@+id/input_secondCountry"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:hint="@string/first_country"
+        android:textColorHint="@color/black"
+        app:layout_constraintTop_toBottomOf="@id/countryTo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="15dp"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/button_color"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/input_secondCountry"
+        android:layout_marginTop="50dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:text="@string/button_text" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

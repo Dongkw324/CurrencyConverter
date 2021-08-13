@@ -6,4 +6,7 @@
 
     <string name="first_country">나라 고르기</string>
     <string name="second_country">나라 고르기</string>
+
+    <string name="button_text">전환하기</string>
+    <string name="enter_amount">화폐액..</string>
 </resources>
