@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">CurrencyConverter</string>
+    <string name="app_name">환율 계산기 어플</string>
+
+    <string name="convert_from">From</string>
+    <string name="convert_to">To</string>
+
+    <string name="first_country">나라 고르기</string>
+    <string name="second_country">나라 고르기</string>
 </resources>
