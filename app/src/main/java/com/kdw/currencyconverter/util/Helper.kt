@@ -2,9 +2,12 @@ package com.kdw.currencyconverter.util
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.view.View
+import android.view.WindowInsetsController
 import android.view.inputmethod.InputMethodManager
 
 @Suppress("DEPRECATION")
@@ -54,5 +57,20 @@ object Helper {
         }
 
         return result
+    }
+
+    //최상단 상태바 투명하게 만들기
+    fun makeStatusTransparent(activity: Activity) {
+        val status = activity.window.decorView
+
+        //API 30부터는 systemUiVisibility 와 SYSTEM_UI_FLAG_LIGHT_STATUS_BAR 가 deprecated 되었으므로 분기 처리
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            status.windowInsetsController?.setSystemBarsAppearance(WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
+            val w = activity.window
+            w.statusBarColor = Color.TRANSPARENT
+        } else
+            status.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            val w = activity.window
+            w.statusBarColor = Color.TRANSPARENT
     }
 }
