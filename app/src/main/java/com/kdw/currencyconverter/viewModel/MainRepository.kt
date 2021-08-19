@@ -11,9 +11,10 @@ import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class MainRepository @Inject constructor(private val newApiSource: NewApiSource) : ApiResource() {
-    suspend fun getConverterData(key: String, from: String, to: String, amount: Double): Flow<ResultResponse<CurrencyResponse>> {
-        return flow{
-            emit(safeApiCall { newApiSource.getCurrency(key, from, to, amount) })
+
+    suspend fun getConverterData(key: String, from: String, to: String, amount: Double) : Flow<ResultResponse<CurrencyResponse>> {
+        return flow {
+           emit(safeApiCall { newApiSource.getCurrency(key, from, to, amount) })
         }.flowOn(Dispatchers.IO)
     }
 }
