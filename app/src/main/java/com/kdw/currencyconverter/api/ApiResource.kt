@@ -9,14 +9,15 @@ abstract class ApiResource {
     suspend fun <T: Any> safeApiCall(call: suspend () -> Response<T>) : ResultResponse<T> {
         return try{
             val myResponse = call()
-
             if(myResponse.isSuccessful) {
-                ResultResponse.Success(myResponse.body()!!)
-            } else {
-                ResultResponse.Error(myResponse.message() ?: "Something wrong")
+                val myBody = myResponse.body()
+                if(myBody != null) {
+                    ResultResponse.success(myBody)
+                }
             }
+            ResultResponse.error("Something error: ${myResponse.message()}")
         }catch(e: Exception) {
-            ResultResponse.Error(e.message ?: "Internet error")
+            ResultResponse.error(e.message ?: e.toString())
         }
     }
 }
