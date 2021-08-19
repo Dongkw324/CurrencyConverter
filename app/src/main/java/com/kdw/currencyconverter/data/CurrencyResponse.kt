@@ -2,7 +2,7 @@ package com.kdw.currencyconverter.data
 
 
 data class CurrencyResponse(
-    val amount: Int,
+    val amount: String,
     val baseCurrencyCode: String,
     val baseCurrencyName: String,
     val rates: HashMap<String, Rates> = HashMap(),
