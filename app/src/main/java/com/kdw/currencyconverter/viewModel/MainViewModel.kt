@@ -4,22 +4,22 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kdw.currencyconverter.data.CurrencyResponse
-import com.kdw.currencyconverter.util.ResultResponse
+import com.kdw.currencyconverter.model.ApiResponse
+import com.kdw.currencyconverter.util.Resource
 import com.kdw.currencyconverter.util.SingleLiveEvent
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class MainViewModel @ViewModelInject constructor(private val mainRepository: MainRepository) : ViewModel() {
+class MainViewModel @ViewModelInject constructor(private val mainRepository: MainRepository): ViewModel() {
 
-    private val _data = SingleLiveEvent<ResultResponse<CurrencyResponse>>()
+    private val _data = SingleLiveEvent<Resource<ApiResponse>>()
 
     val data = _data
-    val convertedRated = MutableLiveData<Double>()
+    val convertedRate = MutableLiveData<Double>()
 
-    fun getConverterData(key: String, from: String, to: String, amount: Double) {
+    fun getConvertData(api_key: String, from: String, to: String, amount: Double) {
         viewModelScope.launch {
-            mainRepository.getConverterData(key, from, to, amount).collect {
+            mainRepository.getConvertData(api_key, from, to, amount).collect {
                 data.value = it
             }
         }

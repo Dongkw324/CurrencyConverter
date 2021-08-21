@@ -1,18 +1,21 @@
 package com.kdw.currencyconverter
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.jaredrummler.materialspinner.MaterialSpinner
+import com.google.android.material.snackbar.Snackbar
 import com.kdw.currencyconverter.databinding.ActivityMainBinding
+import com.kdw.currencyconverter.model.Rates
+import com.kdw.currencyconverter.util.Constants
 import com.kdw.currencyconverter.util.Helper
+import com.kdw.currencyconverter.util.Resource
 import com.kdw.currencyconverter.viewModel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import kotlin.collections.ArrayList
-
-private const val API_KEY = BuildConfig.CURRENCY_API_ID
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -33,82 +36,194 @@ class MainActivity : AppCompatActivity() {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        var selectedCountry1: String ?= "AFN"
-        var selectedCountry2: String ?= "AFN"
+        initSpin()
 
-        init()
-
-        binding.convertBtn.setOnClickListener {
-            convertFunction()
-        }
+        setUpClickListener()
     }
 
-    private fun init() {
+    private fun initSpin(){
 
-        Helper.makeStatusTransparent(this@MainActivity)
+        //get first spinner country reference in view
+        val spinner1 = binding.inputFirstCountry
 
-        setSpinner(binding.inputFirstCountry)
-        setSpinner(binding.inputSecondCountry)
+        //set items in the spinner i.e a list of all countries
+        spinner1.setItems( getAllCountries() )
 
-        binding.inputFirstCountry.setOnItemSelectedListener { view, position, id, item ->
-            val countryCode = getCode(item.toString())
-            val symbol = getSymbol(countryCode)
-            selectedCountry1 = symbol
+        //hide key board when spinner shows (For some weird reasons, this isn't so effective as I am using a custom Material Spinner)
+        spinner1.setOnClickListener {
+            Helper.hideKeyBoard(this)
         }
 
-        binding.inputSecondCountry.setOnItemSelectedListener { view, position, id, item ->
-            val countryCode = getCode(item.toString())
-            val symbol = getSymbol(countryCode)
-            selectedCountry2 = symbol
+        //Handle selected item, by getting the item and storing the value in a  variable - selectedItem1
+        spinner1.setOnItemSelectedListener { view, position, id, item ->
+            //Set the currency code for each country as hint
+            val countryCode = getCountryCode(item.toString())
+            val currencySymbol = getSymbol(countryCode)
+            selectedCountry1 = currencySymbol
+        }
+
+
+        //get second spinner country reference in view
+        val spinner2 = binding.inputSecondCountry
+
+        //hide key board when spinner shows
+        spinner1.setOnClickListener {
+            Helper.hideKeyBoard(this)
+        }
+
+        //set items on second spinner i.e - a list of all countries
+        spinner2.setItems( getAllCountries() )
+
+
+        //Handle selected item, by getting the item and storing the value in a  variable - selectedItem2,
+        spinner2.setOnItemSelectedListener { view, position, id, item ->
+            //Set the currency code for each country as hint
+            val countryCode = getCountryCode(item.toString())
+            val currencySymbol = getSymbol(countryCode)
+            selectedCountry2 = currencySymbol
         }
 
     }
 
-    private fun setSpinner(spinner: MaterialSpinner) {
-        spinner.setItems(getAllCountries())
-        spinner.setOnClickListener {
-            Helper.hideKeyBoard(this@MainActivity)
-        }
-    }
-
-    //나라 코드로부터 화폐 이름 가져오는 메소드
-    // 한국 => KDW
-    // 미국 => USD
     private fun getSymbol(countryCode: String?): String? {
-        val currentLocales = Locale.getAvailableLocales()
-        for(i in currentLocales.indices) {
-            if(currentLocales[i].country == countryCode){
-                return Currency.getInstance(currentLocales[i]).currencyCode
-            }
+        val availableLocales = Locale.getAvailableLocales()
+        for (i in availableLocales.indices) {
+            if (availableLocales[i].country == countryCode
+            ) return Currency.getInstance(availableLocales[i]).currencyCode
         }
-        return null
+        return ""
     }
 
-    //나라 이름으로부터 나라 코드 얻는 메소드
-    private fun getCode(countryName: String) = Locale.getISOCountries().find {
-        Locale("", it).displayCountry == countryName
-    }
+    private fun getCountryCode(countryName: String) = Locale.getISOCountries().find { Locale("", it).displayCountry == countryName }
 
-    //전세계 나라들 목록 가져오기
     private fun getAllCountries(): ArrayList<String> {
 
         val locales = Locale.getAvailableLocales()
         val countries = ArrayList<String>()
-
-        for(locale in locales) {
+        for (locale in locales) {
             val country = locale.displayCountry
-            if(country.trim { it <= ' ' }.isNotEmpty() && !countries.contains(country)){
+            if (country.trim { it <= ' ' }.isNotEmpty() && !countries.contains(country)) {
                 countries.add(country)
             }
         }
         countries.sort()
+
         return countries
     }
 
-    private fun convertFunction() {
+    private fun setUpClickListener() {
+
+        //Convert button clicked - check for empty string and internet then do the conersion
+        binding.convertBtn.setOnClickListener {
+
+            //check if the input is empty
+            val numberToConvert = binding.inputAmount.editText?.text.toString()
+
+            if (numberToConvert.isEmpty() || numberToConvert == "0") {
+                Snackbar.make(
+                    binding.mainLayout,
+                    "Input a value in the first text field, result will be shown in the second text field",
+                    Snackbar.LENGTH_LONG
+                ).show()
+            }
+
+            //check if internet is available
+            else if (!Helper.isNetWordConnected(this)) {
+                Snackbar.make(
+                    binding.mainLayout,
+                    "You are not connected to the internet",
+                    Snackbar.LENGTH_LONG
+                ).show()
+            }
+
+            //carry on and convert the value
+            else {
+                doConversion()
+            }
+        }
+    }
+
+    private fun doConversion(){
+
+        //hide keyboard
+        Helper.hideKeyBoard(this)
+
+        //make progress bar visible
+        binding.progressWork.visibility = View.VISIBLE
+
+        //Get the data inputed
+        val apiKey = Constants.API_KEY
+        val from = selectedCountry1.toString()
+        val to = selectedCountry2.toString()
+        val amount = binding.inputAmount.editText!!.text.toString().toDouble()
+
+        //do the conversion
+        mainViewModel.getConvertData(apiKey, from, to, amount)
+
+        //observe for changes in UI
+        observeUi()
 
     }
 
+    @SuppressLint("SetTextI18n")
+    private fun observeUi() {
+
+
+        mainViewModel.data.observe(this, androidx.lifecycle.Observer {result ->
+
+            when(result.status){
+                Resource.Status.SUCCESS -> {
+                    if (result.data?.status == "success"){
+
+                        val map: Map<String, Rates>
+
+                        map = result.data.rates
+
+                        map.keys.forEach {
+
+                            val rateForAmount = map[it]?.rate_for_amount
+
+                            mainViewModel.convertedRate.value = rateForAmount
+
+                            //format the result obtained e.g 1000 = 1,000
+                            val formattedString = String.format("%,.2f", mainViewModel.convertedRate.value)
+
+                            //set the value in the second edit text field
+                            binding.resultCurrencyAmount.setText(formattedString)
+
+                        }
+
+
+                        //stop progress bar
+                        binding.progressWork.visibility = View.GONE
+
+                    }
+                    else if(result.data?.status == "fail"){
+                        val layout = binding.mainLayout
+                        Snackbar.make(layout,"Ooops! something went wrong, Try again", Snackbar.LENGTH_LONG)
+                            .show()
+
+                        //stop progress bar
+                        binding.progressWork.visibility = View.GONE
+
+                    }
+                }
+                Resource.Status.ERROR -> {
+
+                    val layout = binding.mainLayout
+                    Snackbar.make(layout,  "Oopps! Something went wrong, Try again", Snackbar.LENGTH_LONG)
+                        .show()
+                    //stop progress bar
+                    binding.progressWork.visibility = View.GONE
+                }
+
+                Resource.Status.LOADING -> {
+                    //stop progress bar
+                    binding.progressWork.visibility = View.VISIBLE
+                }
+            }
+        })
+    }
     override fun onDestroy() {
         _binding = null
         super.onDestroy()

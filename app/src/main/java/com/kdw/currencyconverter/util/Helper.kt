@@ -70,7 +70,7 @@ object Helper {
             w.statusBarColor = Color.TRANSPARENT
         } else
             status.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            val w = activity.window
-            w.statusBarColor = Color.TRANSPARENT
+        val w = activity.window
+        w.statusBarColor = Color.TRANSPARENT
     }
 }
