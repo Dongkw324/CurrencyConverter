@@ -79,6 +79,7 @@ class MainActivity : AppCompatActivity() {
         spinner.setItems(getAllCountries())
     }
 
+    //Locale 클래스: 지역의 언어나 나라 등의 정보를 담고 있는 클래스
     private fun getSymbol(countryCode: String?): String? {
         val availableLocales = Locale.getAvailableLocales()
         for (i in availableLocales.indices) {
@@ -88,8 +89,10 @@ class MainActivity : AppCompatActivity() {
         return ""
     }
 
+    //국가 코드 얻는 메소드
     private fun getCountryCode(countryName: String) = Locale.getISOCountries().find { Locale("", it).displayCountry == countryName }
 
+    //모든 국가들의 목록을 가져오는 메소드
     private fun getAllCountries(): ArrayList<String> {
 
         val locales = Locale.getAvailableLocales()
