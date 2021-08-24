@@ -1,16 +1,19 @@
 package com.kdw.currencyconverter.viewModel
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kdw.currencyconverter.model.ApiResponse
 import com.kdw.currencyconverter.util.Resource
 import com.kdw.currencyconverter.util.SingleLiveEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel @ViewModelInject constructor(private val mainRepository: MainRepository): ViewModel() {
+//ViewModel에서 @HildViewModel Annotation과 @Inject Annotation을 사용하여 간단하게 ViewModel 의존성 주입 활성화 가능
+@HiltViewModel
+class MainViewModel @Inject constructor(private val mainRepository: MainRepository): ViewModel() {
 
     private val _data = SingleLiveEvent<Resource<ApiResponse>>()
 

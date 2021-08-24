@@ -1,5 +1,8 @@
 package com.kdw.currencyconverter.util
 
+
+// Retrofit 응답 관리 클래스
+// success: 응답 성공, error: 응답 실패
 data class Resource <out T>(val status: Status, val data: T?, val msg: String?) {
 
     enum class Status{
