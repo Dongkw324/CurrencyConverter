@@ -14,13 +14,10 @@ abstract class ApiDataSource {
                     return Resource.success(body)
                 }
             }
-            return error("${res.code()} ${res.message()}")
+            return Resource.error("네트워크 연결 오류 : ${res.code()} ${res.message()}")
         }catch(e: Exception) {
-            return error(e.message ?: e.toString())
+            return Resource.error(e.message ?: e.toString())
         }
     }
 
-    private fun <T> error(message: String) : Resource<T> {
-        return Resource.error("Network call failed : $message")
-    }
 }

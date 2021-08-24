@@ -7,9 +7,9 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
+import com.jaredrummler.materialspinner.MaterialSpinner
 import com.kdw.currencyconverter.databinding.ActivityMainBinding
 import com.kdw.currencyconverter.model.Rates
-import com.kdw.currencyconverter.util.Constants
 import com.kdw.currencyconverter.util.Helper
 import com.kdw.currencyconverter.util.Resource
 import com.kdw.currencyconverter.viewModel.MainViewModel
@@ -17,6 +17,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import kotlin.collections.ArrayList
 
+// 객체를 주입할 Android 클래스에 @AndroidEntryPoint Annotation을 추가
+// 이것만으로 자동으로 생명주기에 따라 적절한 시점에 Hilt 요소로 인스턴스화 되어 처리된다.
+// 이 Annotation으로 의존성 주입의 시작점을 나타낸다.
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
@@ -30,59 +33,50 @@ class MainActivity : AppCompatActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
 
+    private val API_KEY = BuildConfig.CURRENCY_API_ID
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        initSpin()
+        Helper.makeStatusTransparent(this)
+
+        init()
 
         setUpClickListener()
     }
 
-    private fun initSpin(){
+    private fun init(){
 
-        //get first spinner country reference in view
-        val spinner1 = binding.inputFirstCountry
-
-        //set items in the spinner i.e a list of all countries
-        spinner1.setItems( getAllCountries() )
-
-        //hide key board when spinner shows (For some weird reasons, this isn't so effective as I am using a custom Material Spinner)
-        spinner1.setOnClickListener {
-            Helper.hideKeyBoard(this)
-        }
-
+        setSpin(binding.inputFirstCountry)
         //Handle selected item, by getting the item and storing the value in a  variable - selectedItem1
-        spinner1.setOnItemSelectedListener { view, position, id, item ->
+        binding.inputFirstCountry.setOnItemSelectedListener { view, position, id, item ->
             //Set the currency code for each country as hint
             val countryCode = getCountryCode(item.toString())
             val currencySymbol = getSymbol(countryCode)
             selectedCountry1 = currencySymbol
         }
 
-
-        //get second spinner country reference in view
-        val spinner2 = binding.inputSecondCountry
-
-        //hide key board when spinner shows
-        spinner1.setOnClickListener {
-            Helper.hideKeyBoard(this)
-        }
-
-        //set items on second spinner i.e - a list of all countries
-        spinner2.setItems( getAllCountries() )
-
-
+        setSpin(binding.inputSecondCountry)
         //Handle selected item, by getting the item and storing the value in a  variable - selectedItem2,
-        spinner2.setOnItemSelectedListener { view, position, id, item ->
+        binding.inputSecondCountry.setOnItemSelectedListener { view, position, id, item ->
             //Set the currency code for each country as hint
             val countryCode = getCountryCode(item.toString())
             val currencySymbol = getSymbol(countryCode)
             selectedCountry2 = currencySymbol
         }
 
+    }
+
+    private fun setSpin(spinner : MaterialSpinner) {
+        spinner.setOnClickListener {
+            Helper.hideKeyBoard(this)
+        }
+
+        spinner.setItems(getAllCountries())
     }
 
     private fun getSymbol(countryCode: String?): String? {
@@ -152,7 +146,7 @@ class MainActivity : AppCompatActivity() {
         binding.progressWork.visibility = View.VISIBLE
 
         //Get the data inputed
-        val apiKey = Constants.API_KEY
+        val apiKey = API_KEY
         val from = selectedCountry1.toString()
         val to = selectedCountry2.toString()
         val amount = binding.inputAmount.editText!!.text.toString().toDouble()
@@ -186,7 +180,7 @@ class MainActivity : AppCompatActivity() {
                             mainViewModel.convertedRate.value = rateForAmount
 
                             //format the result obtained e.g 1000 = 1,000
-                            val formattedString = String.format("%,.2f", mainViewModel.convertedRate.value)
+                            val formattedString = String.format("%,.4f", mainViewModel.convertedRate.value)
 
                             //set the value in the second edit text field
                             binding.resultCurrencyAmount.setText(formattedString)
@@ -194,7 +188,6 @@ class MainActivity : AppCompatActivity() {
                         }
 
 
-                        //stop progress bar
                         binding.progressWork.visibility = View.GONE
 
                     }
@@ -203,7 +196,6 @@ class MainActivity : AppCompatActivity() {
                         Snackbar.make(layout,"Ooops! something went wrong, Try again", Snackbar.LENGTH_LONG)
                             .show()
 
-                        //stop progress bar
                         binding.progressWork.visibility = View.GONE
 
                     }
@@ -213,13 +205,8 @@ class MainActivity : AppCompatActivity() {
                     val layout = binding.mainLayout
                     Snackbar.make(layout,  "Oopps! Something went wrong, Try again", Snackbar.LENGTH_LONG)
                         .show()
-                    //stop progress bar
-                    binding.progressWork.visibility = View.GONE
-                }
 
-                Resource.Status.LOADING -> {
-                    //stop progress bar
-                    binding.progressWork.visibility = View.VISIBLE
+                    binding.progressWork.visibility = View.GONE
                 }
             }
         })
