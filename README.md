@@ -13,7 +13,7 @@
 [참고 https://ichi.pro/ko/gandanhan-tonghwa-byeonhwangi-aeb-eul-guchug-han-bangbeob-gwonjangdoeneun-android-paeteon-mich-akitegcheo-sayong-35503202091330](https://ichi.pro/ko/gandanhan-tonghwa-byeonhwangi-aeb-eul-guchug-han-bangbeob-gwonjangdoeneun-android-paeteon-mich-akitegcheo-sayong-35503202091330)
 
 ***
-### 사용 기술  
+### 사용 라이브러리   
   
 **MVVM Design Pattern**  
 **ViewModel**  
@@ -22,3 +22,4 @@
 **Retrofit**  
 **Dagger-Hilt Dependency Injection**  
 **ViewBinding**  
+**Material Spinner**  
